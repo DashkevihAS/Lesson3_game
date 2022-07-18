@@ -21,14 +21,23 @@ export class ClassComponent extends React.Component {
   handleSubmit = (e) => {
     e.preventDefault();
     this.setState(state => {
-      if (state.userNumber && state.userNumber <= this.props.max) {
+      if (
+        state.userNumber &&
+        (state.userNumber <= this.props.max) &&
+        (state.userNumber >= this.props.min)
+      ) {
         return {
           count: state.count + 1};
       }
     });
 
     this.setState(state => {
-      if ((!state.userNumber || state.userNumber > this.props.max) && !state.isWin) {
+      if (
+        ((!state.userNumber ||
+          (state.userNumber > this.props.max) ||
+          (state.userNumber < this.props.min))) &&
+          !state.isWin
+      ) {
         return {
           result: `Число должно быть в диапазоне
           от ${this.props.min} до ${this.props.max} `,
@@ -75,17 +84,6 @@ export class ClassComponent extends React.Component {
     });
   };
 
-  // handleReplay = (e) => {
-  //   e.preventDefault();
-  //   this.setState(state => ({
-  //     result: `Угадайте число от ${this.props.min} до ${this.props.max} `,
-  //     randomNumber:
-  //     Math.floor(Math.random() * (this.props.max - this.props.min)) +
-  //     this.props.min,
-  //     count: 0,
-  //     isWin: false,
-  //   }));
-  // };
   render() {
     console.log(this.state);
     return (
