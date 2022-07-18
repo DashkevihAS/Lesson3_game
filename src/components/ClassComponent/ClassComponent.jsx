@@ -3,27 +3,35 @@ import style from './ClassComponent.module.css';
 import PropTypes from 'prop-types';
 
 export class ClassComponent extends React.Component {
-  state = {
-    result: 'Результат',
-    userNumber: '',
-    randomNumber:
-      Math.floor(Math.random() * (this.props.max - this.props.min)) +
-      this.props.min,
-    count: 0,
-    isWin: false,
-  };
+  constructor(props) {
+    super(props);
 
+    this.state = {
+      result: `Угадайте число от ${this.props.min} до ${this.props.max} `,
+      userNumber: '',
+      randomNumber:
+        Math.floor(Math.random() * (this.props.max - this.props.min)) +
+        this.props.min,
+      count: 0,
+      isWin: false,
+      isReadOnly: '',
+    };
+  }
 
   handleSubmit = (e) => {
     e.preventDefault();
-    this.setState(state => ({
-      count: state.count + 1,
-    }));
+    this.setState(state => {
+      if (state.userNumber && state.userNumber <= this.props.max) {
+        return {
+          count: state.count + 1};
+      }
+    });
 
     this.setState(state => {
-      if (!state.userNumber) {
+      if ((!state.userNumber || state.userNumber > this.props.max) && !state.isWin) {
         return {
-          result: `Введите число`,
+          result: `Число должно быть в диапазоне
+          от ${this.props.min} до ${this.props.max} `,
         };
       }
 
@@ -33,9 +41,20 @@ export class ClassComponent extends React.Component {
         };
       }
 
-      if (state.userNumber < state.randomNumber) {
+      if ((state.userNumber < state.randomNumber) && !state.isWin) {
         return {
           result: `${state.userNumber} меньше  загаданного`,
+        };
+      }
+
+      if (state.isWin) {
+        return {
+          result: `Угадайте число от ${this.props.min} до ${this.props.max} `,
+          randomNumber:
+          Math.floor(Math.random() * (this.props.max - this.props.min)) +
+          this.props.min,
+          count: 0,
+          isWin: false,
         };
       }
 
@@ -56,18 +75,17 @@ export class ClassComponent extends React.Component {
     });
   };
 
-  handleReplay = (e) => {
-    e.preventDefault();
-    this.setState(state => ({
-      result: 'Результат',
-      randomNumber:
-      Math.floor(Math.random() * (this.props.max - this.props.min)) +
-      this.props.min,
-      count: 0,
-      isWin: false,
-    }));
-  };
-
+  // handleReplay = (e) => {
+  //   e.preventDefault();
+  //   this.setState(state => ({
+  //     result: `Угадайте число от ${this.props.min} до ${this.props.max} `,
+  //     randomNumber:
+  //     Math.floor(Math.random() * (this.props.max - this.props.min)) +
+  //     this.props.min,
+  //     count: 0,
+  //     isWin: false,
+  //   }));
+  // };
   render() {
     console.log(this.state);
     return (
@@ -79,16 +97,18 @@ export class ClassComponent extends React.Component {
             Угадай число
           </label>
 
+          {!this.state.isWin ?
           <input className={style.input} type='number' id='user_number'
             onChange={this.handleChange} value={this.state.userNumber}
+          /> :
+          <input className={style.input} type='number' id='user_number' readOnly
+            onChange={this.handleChange} value={this.state.userNumber}
           />
+          }
 
-          <button className={style.btn}>Угадать</button>
-          {!this.state.isWin ?
-          '' :
-          <button className={style.btn} onClick={this.handleReplay}>
-          Сыграть еще
-          </button>}
+          <button className={style.btn}>
+            {!this.state.isWin ? 'Угадать' : 'Сыграть еще'}
+          </button>
         </form>
       </div>
     );
